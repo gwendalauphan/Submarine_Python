@@ -80,3 +80,27 @@ Tkinter widgets should be created and updated on the main thread. Worker threads
 can do background work, but they should communicate results back to the UI with a
 thread-safe queue and `after()` polling.
 
+### Multi-Window Parallel Refresh Demo
+
+```bash
+python3 playground/concurrency/multi_window_parallel_refresh_demo.py
+```
+
+Optional parameters:
+
+```bash
+python3 playground/concurrency/multi_window_parallel_refresh_demo.py --windows 4 --refresh-ms 25 --duration-s 10
+```
+
+Expected behavior:
+
+- Starts one process per Tkinter window.
+- Opens several windows at the same time in a graphical environment.
+- Refreshes each window independently with `after()`.
+- Closes all windows after the configured duration.
+
+This is the safest playground model for refreshing multiple Tkinter views in
+parallel: each process owns its own Tk root and event loop. For the submarine
+simulator, this suggests a possible optimization direction where expensive
+calculation work can move out of the main UI process, while Tkinter rendering
+still stays owned by the process that created the widgets.
