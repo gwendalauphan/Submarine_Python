@@ -19,7 +19,17 @@ class plot_one:
         self.rot_x_1 = self.position_back.create_line(self.win_width/8 ,  self.win_height/4 , self.win_width/8- cos(self.parent.angle_par_x)*self.win_width/16,self.win_height/4 + sin(self.parent.angle_par_x)*self.win_width/16 , fill ='red')
         self.rot_x_2 = self.position_back.create_line(self.win_width/8 ,  self.win_height/4 , self.win_width/8+ cos(self.parent.angle_par_x)*self.win_width/16,self.win_height/4 - sin(self.parent.angle_par_x)*self.win_width/16 , fill ='red')
     def rotate_plot(self):
-        self.position_back.delete(self.parent.win, self.rot_x_1)
-        self.position_back.delete(self.parent.win, self.rot_x_2)
-        self.rot_x_1 = self.position_back.create_line(self.win_width/8 ,  self.win_height/4 , self.win_width/8- cos(self.parent.angle_par_x)*self.win_width/16,self.win_height/4 + sin(self.parent.angle_par_x)*self.win_width/16 , fill ='red')
-        self.rot_x_2 = self.position_back.create_line(self.win_width/8 ,  self.win_height/4 , self.win_width/8+ cos(self.parent.angle_par_x)*self.win_width/16,self.win_height/4 - sin(self.parent.angle_par_x)*self.win_width/16 , fill ='red')
+        self.position_back.coords(
+            self.rot_x_1,
+            self.win_width/8,
+            self.win_height/4,
+            self.win_width/8- cos(self.parent.angle_par_x)*self.win_width/16,
+            self.win_height/4 + sin(self.parent.angle_par_x)*self.win_width/16,
+        )
+        self.position_back.coords(
+            self.rot_x_2,
+            self.win_width/8,
+            self.win_height/4,
+            self.win_width/8+ cos(self.parent.angle_par_x)*self.win_width/16,
+            self.win_height/4 - sin(self.parent.angle_par_x)*self.win_width/16,
+        )

@@ -43,6 +43,9 @@ cd src
 python3 main.py
 ```
 
+The main dashboard opens first. The 3D terrain view opens in a separate window
+owned by its own process.
+
 Controls:
 
 - Right arrow: turn right
@@ -89,8 +92,9 @@ The display is split across plot modules:
 - `plot_6.py` displays numeric telemetry.
 - `plot_3d/plot_5.py` renders the 3D scene, using `plot_3d/map.py` and
   `plot_3d/perlin.py` for terrain generation.
+- `plot_3d/plot_5_process.py` runs that 3D scene in a separate process/window
+  and receives latest-only submarine snapshots from the main dashboard.
 
 The concurrency playground is separate from the simulator code. It is meant for
 testing whether multiprocessing, threading, or independent UI processes could
 help optimize heavier work in future versions.
-
