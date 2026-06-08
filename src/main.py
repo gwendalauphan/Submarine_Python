@@ -11,6 +11,10 @@ from plot_3d.plot_5 import plot_five
 from plot_6 import plot_six_central
 
 
+HISTORY_MAXLEN = 300
+HISTORY_SAMPLE_TICKS = 5
+
+
 """
 rotation à partir de l'axe z
 
@@ -42,15 +46,15 @@ class submarine:
         self.running = True
         self.after_id = None
 
-        self.liste_acc_relatif = deque(maxlen=1000)
-        self.liste_v_relatif = deque(maxlen=1000)
-        self.liste_acc_x = deque(maxlen=1000)
-        self.liste_acc_y = deque(maxlen=1000)
-        self.liste_acc_z = deque(maxlen=1000)
-        self.liste_v_x = deque(maxlen=1000)
-        self.liste_v_y = deque(maxlen=1000)
-        self.liste_v_z = deque(maxlen=1000)
-        self.liste_time = deque(maxlen=1000)
+        self.liste_acc_relatif = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_v_relatif = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_acc_x = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_acc_y = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_acc_z = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_v_x = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_v_y = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_v_z = deque(maxlen=HISTORY_MAXLEN)
+        self.liste_time = deque(maxlen=HISTORY_MAXLEN)
 
         #Caractéristiques du SOUS MARIN
         self.height = height
@@ -234,24 +238,28 @@ class submarine:
         cx = cos(self.angle_par_x)
         sx = sin(self.angle_par_x)
 
-        self.matrice_rotation = np.array([
-            cz * cy,
-            -sz * cx + sx * cz * sy,
-            sx * sz + sy * cz * cx,
-            cy * sz,
-            cz * cx + sy * sz * sx,
-            -cz * sx + cx * sy * sz,
-            -sy,
-            cy * sx,
-            cy * cx,
-        ]).reshape(3,3)
+        vx, vy, vz = self.vect[0]
+        r00 = cz * cy
+        r01 = -sz * cx + sx * cz * sy
+        r02 = sx * sz + sy * cz * cx
+        r10 = cy * sz
+        r11 = cz * cx + sy * sz * sx
+        r12 = -cz * sx + cx * sy * sz
+        r20 = -sy
+        r21 = cy * sx
+        r22 = cy * cx
 
-        self.vect = self.vect.dot(self.matrice_rotation)
-        self.coor += self.speed_re*(self.vect)*self.t3
+        new_vx = vx * r00 + vy * r10 + vz * r20
+        new_vy = vx * r01 + vy * r11 + vz * r21
+        new_vz = vx * r02 + vy * r12 + vz * r22
+        self.vect[0][0], self.vect[0][1], self.vect[0][2] = new_vx, new_vy, new_vz
+
+        self.coor[0][0] += self.speed_re * new_vx * self.t3
+        self.coor[0][1] += self.speed_re * new_vy * self.t3
         self.coor[0][2] = -self.z
 
-        self.speed_x, self.speed_y = self.speed_re*self.vect[0][0], self.speed_re*self.vect[0][1]
-        self.a_x, self.a_y = self.a_re*self.vect[0][0], self.a_re*self.vect[0][1]
+        self.speed_x, self.speed_y = self.speed_re*new_vx, self.speed_re*new_vy
+        self.a_x, self.a_y = self.a_re*new_vx, self.a_re*new_vy
 
 
         if self.var % 250== 0:
@@ -279,20 +287,21 @@ class submarine:
             #print(self.liste_acc_relatif)
             #print(self.liste_time)
 
-        if self.plot_4.v.get() == 1:
-            self.liste_acc_x.append(self.a_x)
-            self.liste_acc_y.append(self.a_y)
-            self.liste_acc_z.append(self.a_z)
-        elif self.plot_4.v.get() == 0:
-            self.liste_v_x.append(self.speed_x)
-            self.liste_v_y.append(self.speed_y)
-            self.liste_v_z.append(self.speed_z)
+        if self.var % HISTORY_SAMPLE_TICKS == 0:
+            if self.plot_4.v.get() == 1:
+                self.liste_acc_x.append(self.a_x)
+                self.liste_acc_y.append(self.a_y)
+                self.liste_acc_z.append(self.a_z)
+            elif self.plot_4.v.get() == 0:
+                self.liste_v_x.append(self.speed_x)
+                self.liste_v_y.append(self.speed_y)
+                self.liste_v_z.append(self.speed_z)
 
-        elif self.plot_4.v.get() == 2:
-            self.liste_acc_relatif.append(self.a_re)
-            self.liste_v_relatif.append(self.speed_re)
+            elif self.plot_4.v.get() == 2:
+                self.liste_acc_relatif.append(self.a_re)
+                self.liste_v_relatif.append(self.speed_re)
 
-        self.liste_time.append(self.t2)
+            self.liste_time.append(self.t2)
 
         if self.angle_boussole_2 > -pi/4 and self.angle_boussole_2 < pi/4:
             self.angle_boussole_2 +=self.gouvernail/5
