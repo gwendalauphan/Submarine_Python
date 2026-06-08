@@ -219,10 +219,7 @@ class plot_five:
             self.vect_view = self.vect_view.dot(self.matrice(0, 0, -(self.sensi.get()*pi)/180))
 
         self.ax_1.view_init(elev = self.angle_ver, azim = self.angle_hor)
-        print(self.angle_ver, self.angle_hor)
-        #print(self.vect_view)
-
-        self.fig_1.canvas.draw()
+        self.fig_1.canvas.draw_idle()
 
     def update_graph_rot_ver(self,a): #ROT de la view
         if a == 0:
@@ -238,7 +235,7 @@ class plot_five:
             else:
                 self.vect_view = self.vect_view.dot(self.matrice(0, -(self.sensi.get()*pi)/180, 0))
         self.ax_1.view_init(elev = self.angle_ver, azim = self.angle_hor)
-        self.fig_1.canvas.draw()
+        self.fig_1.canvas.draw_idle()
 
     def ZOOM(self, a):
         if a ==1:
@@ -305,13 +302,13 @@ class plot_five:
             self.ax_1.set_xlim(self.min[0][0], self.max[0][0])
             self.ax_1.set_ylim(self.max[0][1],self.min[0][1])
             #self.ax_1.set_zlim(self.min[0][2], self.max[0][2])
-        self.sub.remove()
-        self.arrow_sub.remove()
-        print(self.parent.coor[0][0] - self.parent.vect[0][0]*self.scale*3)
-        self.arrow_sub = myArrow3D([self.parent.coor[0][0] - self.parent.vect[0][0]*self.scale*3,self.parent.coor[0][0]] + self.parent.vect[0][0]*self.scale*3\
-                                  ,[self.parent.coor[0][1] - self.parent.vect[0][1]*self.scale*3,self.parent.coor[0][1]] + self.parent.vect[0][1]*self.scale*3\
-                                  ,[self.parent.coor[0][2] - self.parent.vect[0][2]*self.scale*3,self.parent.coor[0][2]] + self.parent.vect[0][2]*self.scale*3\
-                                  , mutation_scale=10, lw=2, arrowstyle="fancy", color="white", alpha = 1)
-        self.ax_1.add_artist(self.arrow_sub)
-        self.sub = self.ax_1.scatter3D(self.parent.coor[0][0],self.parent.coor[0][1],self.parent.coor[0][2], s = 40, c = 'white', alpha = 1)
-        self.fig_1.canvas.draw()
+        x = self.parent.coor[0][0]
+        y = self.parent.coor[0][1]
+        z = self.parent.coor[0][2]
+        vx = self.parent.vect[0][0] * self.scale * 3
+        vy = self.parent.vect[0][1] * self.scale * 3
+        vz = self.parent.vect[0][2] * self.scale * 3
+
+        self.arrow_sub._verts3d = ([x - vx, x + vx], [y - vy, y + vy], [z - vz, z + vz])
+        self.sub._offsets3d = ([x], [y], [z])
+        self.fig_1.canvas.draw_idle()

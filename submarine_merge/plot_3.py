@@ -37,33 +37,49 @@ class plot_three:
             if a%5 == 0:
                 self.liste_angles.append(self.liste_angles_0[a])
 
+        self.tick_items = []
+        self.label_items = []
         for a,i in (enumerate(self.liste_angles)):
             if a%5==0 and a%9!=0:
                 self.l = 5
             elif a%9 ==0:
                 self.l = 10
-                self.boussole.create_text((1/8)*self.win_width + (3/16)*self.win_height*cos(i) + cos(i)*self.l, (1/4)*self.win_height + (3/16)*sin(i)*self.win_height +sin(i)*self.l, text = self.liste_orientation[int(a/9)], fill ='red')
+                text_id = self.boussole.create_text((1/8)*self.win_width + (3/16)*self.win_height*cos(i) + cos(i)*self.l, (1/4)*self.win_height + (3/16)*sin(i)*self.win_height +sin(i)*self.l, text = self.liste_orientation[int(a/9)], fill ='red')
+                self.label_items.append((text_id, int(a/9), i))
             else:
                 self.l = 3
-            liset = self.boussole.create_line((1/8)*self.win_width + (3/16)*self.win_height*cos(i),(1/4)*self.win_height - (3/16)*sin(i)*self.win_height,(1/8)*self.win_width + (3/16)*self.win_height*cos(i) - cos(i)*self.l, (1/4)*self.win_height - (3/16)*sin(i)*self.win_height +sin(i)*self.l, fill ="red")
+            line_id = self.boussole.create_line((1/8)*self.win_width + (3/16)*self.win_height*cos(i),(1/4)*self.win_height - (3/16)*sin(i)*self.win_height,(1/8)*self.win_width + (3/16)*self.win_height*cos(i) - cos(i)*self.l, (1/4)*self.win_height - (3/16)*sin(i)*self.win_height +sin(i)*self.l, fill ="red")
+            self.tick_items.append((line_id, i, self.l))
+
+        self.direction_line = self.boussole.create_line((1/8)*self.win_width, y2, (1/8)*self.win_width -sin(self.parent.angle_boussole_2)*(1/45)*self.win_width, y2+ cos(self.parent.angle_boussole_2)*(1/45)*self.win_width, fill ="yellow")
 
     def rotate_boussole(self):
-        x0, y0 = (1/8)*self.win_width + (1/64)*self.win_width,(1/4)*self.win_height + (7/(16*4))*self.win_height
         x1, y1 = (1/8)*self.win_width + (1/180)*self.win_width, (1/4)*self.win_height + (8/(16*4))*self.win_height
         x2, y2 = (1/8)*self.win_width - (1/180)*self.win_width, (1/4)*self.win_height + (8/(16*4))*self.win_height
-        x3, y3 = (1/8)*self.win_width - (1/64)*self.win_width, (1/4)*self.win_height + (7/(16*4))*self.win_height
-        for i in (self.boussole.find_all()):
-            if i>len(self.boussole.find_all())-81:
-                self.boussole.delete(self.parent.win, i)
 
-        for a,i in (enumerate(self.liste_angles)):
-            if a%5==0 and a%9!=0:
-                self.l = 5
-            elif a%9 ==0:
-                self.l = 10
-                self.boussole.create_text((1/8)*self.win_width + (3/16)*self.win_height*cos(i+self.parent.angle_boussole) + cos(i+self.parent.angle_boussole)*self.l, (1/4)*self.win_height + (3/16)*sin(i+self.parent.angle_boussole)*self.win_height +sin(i+self.parent.angle_boussole)*self.l, text = self.liste_orientation[int(a/9)], fill ='red')
-            else:
-                self.l = 3
-            self.boussole.create_line((1/8)*self.win_width + (3/16)*self.win_height*cos(i-self.parent.angle_boussole),(1/4)*self.win_height - (3/16)*sin(i-self.parent.angle_boussole)*self.win_height,(1/8)*self.win_width + (3/16)*self.win_height*cos(i-self.parent.angle_boussole) - cos(i-self.parent.angle_boussole)*self.l, (1/4)*self.win_height - (3/16)*sin(i-self.parent.angle_boussole)*self.win_height +sin(i-self.parent.angle_boussole)*self.l, fill ="red")
+        for line_id, angle, tick_len in self.tick_items:
+            a = angle - self.parent.angle_boussole
+            self.boussole.coords(
+                line_id,
+                (1/8)*self.win_width + (3/16)*self.win_height*cos(a),
+                (1/4)*self.win_height - (3/16)*sin(a)*self.win_height,
+                (1/8)*self.win_width + (3/16)*self.win_height*cos(a) - cos(a)*tick_len,
+                (1/4)*self.win_height - (3/16)*sin(a)*self.win_height + sin(a)*tick_len,
+            )
 
-        self.boussole.create_line((1/8)*self.win_width, y2, (1/8)*self.win_width -sin(self.parent.angle_boussole_2)*(1/45)*self.win_width, y2+ cos(self.parent.angle_boussole_2)*(1/45)*self.win_width, fill ="yellow")
+        for text_id, orientation_idx, angle in self.label_items:
+            a = angle + self.parent.angle_boussole
+            self.boussole.coords(
+                text_id,
+                (1/8)*self.win_width + (3/16)*self.win_height*cos(a) + cos(a)*10,
+                (1/4)*self.win_height + (3/16)*sin(a)*self.win_height + sin(a)*10,
+            )
+            self.boussole.itemconfig(text_id, text=self.liste_orientation[orientation_idx])
+
+        self.boussole.coords(
+            self.direction_line,
+            (1/8)*self.win_width,
+            y2,
+            (1/8)*self.win_width - sin(self.parent.angle_boussole_2)*(1/45)*self.win_width,
+            y2 + cos(self.parent.angle_boussole_2)*(1/45)*self.win_width,
+        )

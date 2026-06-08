@@ -14,6 +14,12 @@ class plot_two:
         self.point = self.carte.create_oval(-5,self.win_height/2-5,5,self.win_height/2+5, fill = 'red')
 
     def update(self):
-        self.carte.delete(self.parent.win, self.point)
-        self.point = self.carte.create_oval(0+round(self.parent.coor[0][0]*10, 3)-5,self.win_height/2 +round(self.parent.coor[0][1]*10,3)-5,0+round(self.parent.coor[0][0]*10, 3)+5,self.win_height/2+ round(self.parent.coor[0][1]*10,3) +5, fill ='red')
-        #pass
+        x = round(self.parent.coor[0][0] * 10, 3)
+        y = round(self.parent.coor[0][1] * 10, 3)
+        self.carte.coords(
+            self.point,
+            x - 5,
+            self.win_height / 2 + y - 5,
+            x + 5,
+            self.win_height / 2 + y + 5,
+        )

@@ -2,6 +2,7 @@ from tkinter import*
 import numpy as np
 import time
 from time import sleep
+from collections import deque
 from math import *
 from plot_1 import*
 from plot_2 import*
@@ -51,10 +52,15 @@ class submarine:
         self.running = True
         self.after_id = None
 
-        self.liste_acc_relatif, self.liste_v_relatif = [], []
-        self.liste_acc_x, self.liste_acc_y, self.liste_acc_z = [],[],[]
-        self.liste_v_x, self.liste_v_y, self.liste_v_z = [],[],[]
-        self.liste_time = []
+        self.liste_acc_relatif = deque(maxlen=1000)
+        self.liste_v_relatif = deque(maxlen=1000)
+        self.liste_acc_x = deque(maxlen=1000)
+        self.liste_acc_y = deque(maxlen=1000)
+        self.liste_acc_z = deque(maxlen=1000)
+        self.liste_v_x = deque(maxlen=1000)
+        self.liste_v_y = deque(maxlen=1000)
+        self.liste_v_z = deque(maxlen=1000)
+        self.liste_time = deque(maxlen=1000)
 
         #Caractéristiques du SOUS MARIN
         self.height = height
@@ -93,8 +99,6 @@ class submarine:
         self.force_frot_fluides_y = self.μ_eau*self.speed_re*self.length*(self.Cxlin_z)*10
         self.force_frot_fluides_x = self.μ_eau*self.speed_re*self.length*(self.Cxlin_x)*1000
         self.force_elice = self.ρ_eau*((self.tr_min/60)**3)*((self.radius_helice*2)**4)
-        print(self.force_frot_fluides_y,self.force_frot_fluides_x,self.force_frot_fluides_z)
-
         #Différentes accélérations
         self.a_z = (self.Pm - self.Pa - self.force_frot_fluides_y)/self.weight
         self.a_re = (self.force_elice - self.force_frot_fluides_x)/self.weight
@@ -233,9 +237,24 @@ class submarine:
 
 
 
-        self.matrice_rotation = np.array([cos(self.angle_par_z)*cos(self.angle_par_y), -sin(self.angle_par_z)*cos(self.angle_par_x) + sin(self.angle_par_x)*cos(self.angle_par_z)*sin(self.angle_par_y),  sin(self.angle_par_x)*sin(self.angle_par_z) + sin(self.angle_par_y)*cos(self.angle_par_z)*cos(self.angle_par_x),
-                                          cos(self.angle_par_y)*sin(self.angle_par_z),       cos(self.angle_par_z)*cos(self.angle_par_x) + sin(self.angle_par_y)*sin(self.angle_par_z)*sin(self.angle_par_x),       -cos(self.angle_par_z)*sin(self.angle_par_x) + cos(self.angle_par_x)*sin(self.angle_par_y)*sin(self.angle_par_z),
-                                         -sin(self.angle_par_y),                           cos(self.angle_par_y)*sin(self.angle_par_x),                                                                          cos(self.angle_par_y)*cos(self.angle_par_x)]).reshape(3,3)
+        cz = cos(self.angle_par_z)
+        sz = sin(self.angle_par_z)
+        cy = cos(self.angle_par_y)
+        sy = sin(self.angle_par_y)
+        cx = cos(self.angle_par_x)
+        sx = sin(self.angle_par_x)
+
+        self.matrice_rotation = np.array([
+            cz * cy,
+            -sz * cx + sx * cz * sy,
+            sx * sz + sy * cz * cx,
+            cy * sz,
+            cz * cx + sy * sz * sx,
+            -cz * sx + cx * sy * sz,
+            -sy,
+            cy * sx,
+            cy * cx,
+        ]).reshape(3,3)
 
         self.vect = self.vect.dot(self.matrice_rotation)
         self.coor += self.speed_re*(self.vect)*self.t3
@@ -284,24 +303,6 @@ class submarine:
             self.liste_v_relatif.append(self.speed_re)
 
         self.liste_time.append(self.t2)
-
-        if len(self.liste_time)>1000:
-            del self.liste_time[0]
-
-        if len(self.liste_v_x)>1000:
-            del self.liste_v_x[0]
-            del self.liste_v_y[0]
-            del self.liste_v_z[0]
-
-        if len(self.liste_acc_x)>1000:
-            del self.liste_acc_x[0]
-            del self.liste_acc_y[0]
-            del self.liste_acc_z[0]
-
-        if len(self.liste_acc_relatif)>1000:
-            del self.liste_acc_relatif[0]
-            del self.liste_v_relatif[0]
-
 
         if self.angle_boussole_2 > -pi/4 and self.angle_boussole_2 < pi/4:
             self.angle_boussole_2 +=self.gouvernail/5
