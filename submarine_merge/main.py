@@ -12,15 +12,6 @@ from plot_3d.plot_5 import*
 from plot_6 import*
 
 
-win = Tk()
-win.title("Projet")
-win.focus_force()
-win.wm_state(newstate="normal")	# Affiche la fenetre principale en plein écran
-win_height=win.winfo_screenheight()
-win_width=win.winfo_screenwidth()
-#print(win_height, win_width)
-
-
 """
 rotation à partir de l'axe z
 
@@ -331,14 +322,22 @@ class submarine:
             except Exception:
                 pass
         try:
-            self.plot_5.close()
+            if self.plot_5 is not None:
+                self.plot_5.close()
         except Exception:
             pass
         self.win.destroy()
 
 
+def run_app():
+    win = Tk()
+    win.title("Projet")
+    win.focus_force()
+    win.wm_state(newstate="normal")
+
+    submarine(win, 0.15, 0.15, 0.6, 10, 0, 0.00, 0.00, 5.00, 0)
+    win.mainloop()
+
+
 if __name__ == '__main__':
-    sub1 = submarine(win,0.15,0.15,0.6,10,0,0.00,0.00,5.00,0)
-
-
-win.mainloop()
+    run_app()
