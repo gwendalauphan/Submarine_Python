@@ -8,7 +8,6 @@ class plot_six_central:
         self.win_height = win_height
         self.Frame = Frame
 
-        # TO CHECK self.canvas_aff = Canvas(self.win, height = self.win_height/2, width = self.win_width/8, highlightthickness = 0, bg="black")
         self.canvas_aff = Canvas(self.Frame, height = self.win_height/2, width = self.win_width/8, highlightthickness = 0, bg="black")
         self.canvas_aff.pack(fill = BOTH, expand =True)
 
@@ -55,5 +54,4 @@ class plot_six_central:
         self.LabelX["text"] = "x = " + f(self.parent.coor[0][0]) + " m"
         self.LabelY["text"] = "y = " + f(self.parent.coor[0][1]) + " m"
         self.LabelZ["text"] = "z = " + f(self.parent.coor[0][2]) + " m"
-        # TO CHECK self.parent.win.after(50, self.output_var)
         #print(np.matrix(self.parent.coor))
