@@ -1,5 +1,5 @@
-from plot_3d.perlin import*
-import math
+from plot_3d.perlin import noise
+from math import sqrt
 import numpy as np
 
 
@@ -40,7 +40,7 @@ class create_map:
                 z += noise2.perlin(x1 / n2div, y1 / n2div) * n2scale # add boulders
                 z += noise3.perlin(x1 / n3div, y1 / n3div) * n3scale # add rocks
                 if z >= 0:
-                    z = -math.sqrt(z)
+                    z = -sqrt(z)
                 else:
                     z = ((-z) ** (1 / zroot)) ** zpower
                 points.append([x, y, z])

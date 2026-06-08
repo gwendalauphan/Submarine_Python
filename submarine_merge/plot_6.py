@@ -1,4 +1,4 @@
-from tkinter import*
+from tkinter import Canvas, Label, BOTH
 
 class plot_six_central:
     def __init__(self,win, parent,win_width, win_height ,Frame ):

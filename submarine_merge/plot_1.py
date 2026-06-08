@@ -1,7 +1,5 @@
-from tkinter import*
-from math import cos,sin
-
-
+from tkinter import Canvas
+from math import cos, sin
 
 class plot_one:
     def __init__(self, parent,win_width, win_height, height,width,  Frame):

@@ -1,5 +1,4 @@
-from tkinter import*
-
+from tkinter import Canvas
 
 class plot_two:
     def __init__(self, parent,win_width, win_height, height,width, Frame):

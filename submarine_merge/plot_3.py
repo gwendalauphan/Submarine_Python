@@ -1,6 +1,6 @@
-from tkinter import*
+from tkinter import Canvas
 import numpy as np
-from math import cos,sin,pi
+from math import cos, sin, pi
 
 class plot_three:
     def __init__(self, parent,win_width, win_height, height,width, Frame):

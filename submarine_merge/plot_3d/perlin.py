@@ -1,4 +1,6 @@
-import math, random
+from math import ceil, sqrt
+from random import randint, uniform
+
 
 class noise:
     def lerp(self, a0, a1, w):
@@ -10,15 +12,15 @@ class noise:
         return dx * self.gradients[iy][ix][0] + dy * self.gradients[iy][ix][1]
 
     def __init__(self, x, y):
-        x, y = math.ceil(x) + 1, math.ceil(y) + 1
+        x, y = ceil(x) + 1, ceil(y) + 1
         self.gradients = []
         for j in range(y):
             self.gradients.append([])
             for i in range(x):
-                a = random.uniform(0, 1)
-                b = math.sqrt(1 - a ** 2)
-                c = [-1, 1][random.randint(0,1)]
-                d = [-1, 1][random.randint(0,1)]
+                a = uniform(0, 1)
+                b = sqrt(1 - a ** 2)
+                c = [-1, 1][randint(0,1)]
+                d = [-1, 1][randint(0,1)]
                 self.gradients[j].append([a * c, b * d])
 
     def perlin(self, x, y):

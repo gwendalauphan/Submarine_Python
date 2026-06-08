@@ -1,16 +1,14 @@
-from tkinter import*
+from tkinter import PhotoImage, Canvas, Button, Scale, Checkbutton, IntVar, Label, RIGHT, LEFT, CENTER
 import tkinter as tk
-from math import*
+from math import cos, sin, pi
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.pyplot import figure
 import matplotlib.tri as mtri
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from mpl_toolkits.mplot3d import Axes3D,proj3d  # noqa: F401 unused import
-from matplotlib import cm
-from plot_3d.map import*
+from mpl_toolkits.mplot3d import proj3d  # noqa: F401 unused import
+from plot_3d.map import create_map
 
 from matplotlib.patches import FancyArrowPatch
 

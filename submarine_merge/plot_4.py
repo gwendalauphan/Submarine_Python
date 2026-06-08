@@ -1,10 +1,7 @@
-from tkinter import*
+from tkinter import Canvas, LEFT, RIGHT, BOTTOM
 import tkinter as tk
-import numpy as np
-#import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
 class plot_four:
     def __init__(self,win, parent,win_width, win_height ,Frame ):

@@ -1,15 +1,14 @@
-from tkinter import*
+from tkinter import Frame, Tk, TOP, BOTTOM, LEFT, RIGHT
 import numpy as np
 import time
-from time import sleep
 from collections import deque
-from math import *
-from plot_1 import*
-from plot_2 import*
-from plot_3 import*
-from plot_4 import*
-from plot_3d.plot_5 import*
-from plot_6 import*
+from math import cos, sin, pi, log, sqrt
+from plot_1 import plot_one
+from plot_2 import plot_two
+from plot_3 import plot_three
+from plot_4 import plot_four
+from plot_3d.plot_5 import plot_five
+from plot_6 import plot_six_central
 
 
 """
