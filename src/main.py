@@ -1,4 +1,4 @@
-from tkinter import Frame, Tk, TOP, BOTTOM, LEFT, RIGHT
+from tkinter import Frame, Tk, TOP, BOTTOM, LEFT, RIGHT, Label
 import numpy as np
 import time
 from collections import deque
@@ -7,12 +7,19 @@ from plot_1 import plot_one
 from plot_2 import plot_two
 from plot_3 import plot_three
 from plot_4 import plot_four
-from plot_3d.plot_5 import plot_five
+from plot_3d.plot_5_process import (
+    SubmarineSnapshot,
+    close_snapshot_queue,
+    put_latest_snapshot,
+    start_3d_process,
+    stop_3d_process,
+)
 from plot_6 import plot_six_central
 
 
 HISTORY_MAXLEN = 300
 HISTORY_SAMPLE_TICKS = 5
+THREE_D_SNAPSHOT_TICKS = 10
 
 
 """
@@ -44,7 +51,11 @@ class submarine:
         self.win.bind("<Key>", self.rotate)
         self.win.protocol("WM_DELETE_WINDOW", self.on_close)
         self.running = True
+        self.closing = False
         self.after_id = None
+        self.plot_5_process = None
+        self.plot_5_queue = None
+        self.plot_5_stop_event = None
 
         self.liste_acc_relatif = deque(maxlen=HISTORY_MAXLEN)
         self.liste_v_relatif = deque(maxlen=HISTORY_MAXLEN)
@@ -158,14 +169,26 @@ class submarine:
         self.plot_1 = plot_one(self, win_width, win_height, self.height, self.width ,self.Frame_bottom_right_left)
         self.plot_2 = plot_two(self, win_width, win_height, self.height, self.width ,self.Frame_top_right) #Frame_top_right
         self.plot_3 = plot_three(self, win_width, win_height, self.height, self.width, self.Frame_bottom_right_right)
-        self.plot_5 = plot_five(self.win,self, win_width,win_height, self.Frame_top_left)
+        Label(
+            self.Frame_top_left,
+            text="3D view is running in a separate window.",
+            fg="white",
+            bg="black",
+        ).pack(fill="both", expand=True)
         self.plot_4 = plot_four(self.win, self, win_width,win_height, self.Frame_bottom_left)
         self.plot_6 = plot_six_central(self.win, self, win_width, win_height, self.Frame_top_center)
-
 
         self.t1 = time.time()
         self.t2 = 0
         self.t3 = 0.01
+
+        self.plot_5_process, self.plot_5_queue, self.plot_5_stop_event = start_3d_process(
+            self.snapshot(),
+            win_width,
+            win_height,
+        )
+
+
         self.update()
 
     def rotate(self, event = None): #fonction appelée par appuis d'une touche
@@ -194,6 +217,26 @@ class submarine:
 
 
         self.plot_1.rotate_plot()
+
+    def snapshot(self):
+        return SubmarineSnapshot(
+            coor=(self.coor[0][0], self.coor[0][1], self.coor[0][2]),
+            vect=(self.vect[0][0], self.vect[0][1], self.vect[0][2]),
+            elapsed=self.t2,
+        )
+
+    def send_3d_snapshot(self):
+        if self.plot_5_process is None or self.plot_5_queue is None:
+            return
+
+        if not self.plot_5_process.is_alive():
+            close_snapshot_queue(self.plot_5_queue)
+            self.plot_5_process = None
+            self.plot_5_queue = None
+            self.plot_5_stop_event = None
+            return
+
+        put_latest_snapshot(self.plot_5_queue, self.snapshot())
 
     def update(self):
         if not self.running:
@@ -262,8 +305,8 @@ class submarine:
         self.a_x, self.a_y = self.a_re*new_vx, self.a_re*new_vy
 
 
-        if self.var % 250== 0:
-            self.plot_5.update_sub()
+        if self.var % THREE_D_SNAPSHOT_TICKS == 0:
+            self.send_3d_snapshot()
             
         if self.var%50==0:
             self.plot_4.update_graph()
@@ -323,18 +366,31 @@ class submarine:
         self.after_id = self.win.after(10, self.update)
 
     def on_close(self):
+        if self.closing:
+            return
+
+        self.closing = True
         self.running = False
         if self.after_id is not None:
             try:
                 self.win.after_cancel(self.after_id)
             except Exception:
                 pass
+            self.after_id = None
+        if self.plot_5_process is not None and self.plot_5_stop_event is not None:
+            stop_3d_process(self.plot_5_process, self.plot_5_stop_event)
+            close_snapshot_queue(self.plot_5_queue)
+            self.plot_5_process = None
+            self.plot_5_queue = None
+            self.plot_5_stop_event = None
         try:
-            if self.plot_5 is not None:
-                self.plot_5.close()
+            self.win.quit()
         except Exception:
             pass
-        self.win.destroy()
+        try:
+            self.win.destroy()
+        except Exception:
+            pass
 
 
 def run_app():
